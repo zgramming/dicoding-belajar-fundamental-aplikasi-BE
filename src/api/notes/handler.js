@@ -16,8 +16,14 @@ class NotesHandler {
     try {
       this.vldtr.validateNotePayload(request.payload);
       const { title = 'untitled', body, tags } = request.payload;
+      const { id: credentialId } = request.auth.credentials;
 
-      const noteId = await this.svc.addNote({ title, body, tags });
+      const noteId = await this.svc.addNote({
+        title,
+        body,
+        tags,
+        owner: credentialId,
+      });
 
       const response = h.response({
         status: 'success',
@@ -52,8 +58,9 @@ class NotesHandler {
     }
   }
 
-  async getNotesHandler() {
-    const notes = await this.svc.getNotes();
+  async getNotesHandler(request) {
+    const { id: credentialId } = request.auth.credentials;
+    const notes = await this.svc.getNotes(credentialId);
     return {
       status: 'success',
       data: {
@@ -65,6 +72,9 @@ class NotesHandler {
   async getNoteByIdHandler(request, h) {
     try {
       const { id } = request.params;
+      const { id: credentialId } = request.auth.credentials;
+      await this.svc.verifyNoteOwner(id, credentialId);
+
       const note = await this.svc.getNoteById(id);
       return {
         status: 'success',
@@ -99,7 +109,12 @@ class NotesHandler {
     try {
       this.vldtr.validateNotePayload(request.payload);
       const { id } = request.params;
+      const { id: credentialId } = request.auth.credentials;
+
+      await this.svc.verifyNoteOwner(id, credentialId);
+
       await this.svc.editNoteById(id, request.payload);
+
       return {
         status: 'success',
         message: 'Catatan berhasil diperbarui',
@@ -130,6 +145,10 @@ class NotesHandler {
   async deleteNoteByIdHandler(request, h) {
     try {
       const { id } = request.params;
+      const { id: credentialId } = request.auth.credentials;
+
+      await this.svc.verifyNoteOwner(id, credentialId);
+
       await this.svc.deleteNoteById(id);
       return {
         status: 'success',
