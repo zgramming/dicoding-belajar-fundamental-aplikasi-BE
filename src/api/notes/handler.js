@@ -17,7 +17,7 @@ class NotesHandler {
       this.vldtr.validateNotePayload(request.payload);
       const { title = 'untitled', body, tags } = request.payload;
 
-      const noteId = await this.svc.add({ title, body, tags });
+      const noteId = await this.svc.addNote({ title, body, tags });
 
       const response = h.response({
         status: 'success',
@@ -53,7 +53,7 @@ class NotesHandler {
   }
 
   async getNotesHandler() {
-    const notes = await this.svc.getAll();
+    const notes = await this.svc.getNotes();
     return {
       status: 'success',
       data: {
@@ -65,7 +65,7 @@ class NotesHandler {
   async getNoteByIdHandler(request, h) {
     try {
       const { id } = request.params;
-      const note = await this.svc.getById(id);
+      const note = await this.svc.getNoteById(id);
       return {
         status: 'success',
         data: {
@@ -99,7 +99,7 @@ class NotesHandler {
     try {
       this.vldtr.validateNotePayload(request.payload);
       const { id } = request.params;
-      await this.svc.editById(id, request.payload);
+      await this.svc.editNoteById(id, request.payload);
       return {
         status: 'success',
         message: 'Catatan berhasil diperbarui',
@@ -130,7 +130,7 @@ class NotesHandler {
   async deleteNoteByIdHandler(request, h) {
     try {
       const { id } = request.params;
-      await this.svc.deleteById(id);
+      await this.svc.deleteNoteById(id);
       return {
         status: 'success',
         message: 'Catatan berhasil dihapus',
