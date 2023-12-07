@@ -1,6 +1,9 @@
+const ClientError = require('../../exceptions/ClientError');
+
 class NotesHandler {
-  constructor(service) {
+  constructor(service, validator) {
     this.svc = service;
+    this.vldtr = validator;
 
     this.postNoteHandler = this.postNoteHandler.bind(this);
     this.getNotesHandler = this.getNotesHandler.bind(this);
@@ -11,6 +14,7 @@ class NotesHandler {
 
   async postNoteHandler(request, h) {
     try {
+      this.vldtr.validateNotePayload(request.payload);
       const { title = 'untitled', body, tags } = request.payload;
 
       const noteId = await this.svc.add({ title, body, tags });
@@ -26,12 +30,24 @@ class NotesHandler {
       response.code(201);
       return response;
     } catch (err) {
+      if (err instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: err.message,
+        });
+
+        response.code(err.statusCode);
+        return response;
+      }
+
+      // Server ERROR!
       const response = h.response({
-        status: 'fail',
-        message: err.message,
+        status: 'error',
+        message: 'Maaf, terjadi kegagalan pada server kami.',
       });
 
-      response.code(400);
+      response.code(500);
+      console.error(err);
       return response;
     }
   }
@@ -57,17 +73,31 @@ class NotesHandler {
         },
       };
     } catch (err) {
+      if (err instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: err.message,
+        });
+
+        response.code(err.statusCode);
+        return response;
+      }
+
+      // Server ERROR!
       const response = h.response({
-        status: 'fail',
-        message: err.message,
+        status: 'error',
+        message: 'Maaf, terjadi kegagalan pada server kami.',
       });
-      response.code(404);
+
+      response.code(500);
+      console.error(err);
       return response;
     }
   }
 
   async putNoteByIdHandler(request, h) {
     try {
+      this.vldtr.validateNotePayload(request.payload);
       const { id } = request.params;
       await this.svc.editById(id, request.payload);
       return {
@@ -75,11 +105,24 @@ class NotesHandler {
         message: 'Catatan berhasil diperbarui',
       };
     } catch (err) {
+      if (err instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: err.message,
+        });
+
+        response.code(err.statusCode);
+        return response;
+      }
+
+      // Server ERROR!
       const response = h.response({
-        status: 'fail',
-        message: err.message,
+        status: 'error',
+        message: 'Maaf, terjadi kegagalan pada server kami.',
       });
-      response.code(404);
+
+      response.code(500);
+      console.error(err);
       return response;
     }
   }
@@ -93,11 +136,24 @@ class NotesHandler {
         message: 'Catatan berhasil dihapus',
       };
     } catch (err) {
+      if (err instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: err.message,
+        });
+
+        response.code(err.statusCode);
+        return response;
+      }
+
+      // Server ERROR!
       const response = h.response({
-        status: 'fail',
-        message: err.message,
+        status: 'error',
+        message: 'Maaf, terjadi kegagalan pada server kami.',
       });
-      response.code(404);
+
+      response.code(500);
+      console.error(err);
       return response;
     }
   }
