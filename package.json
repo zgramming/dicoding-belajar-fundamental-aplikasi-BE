@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/amqplib": "^0.10.4",
     "@types/bcrypt": "^5.0.2",
     "eslint": "^8.52.0",
     "eslint-config-airbnb-base": "^15.0.0",
@@ -22,6 +23,7 @@
   "dependencies": {
     "@hapi/hapi": "^21.3.2",
     "@hapi/jwt": "^3.2.0",
+    "amqplib": "^0.10.3",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.3.1",
     "joi": "^17.11.0",
